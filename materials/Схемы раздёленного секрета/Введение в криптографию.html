@@ -1,0 +1,233 @@
+<!doctype html>
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../style.css">
+    
+<link href="https://rawcdn.githack.com/iliakonnov/linlibertine/718d3ae934bec3bb1cb173af93ad22a42362c266/linlibertine.css" rel="stylesheet"> 
+<style>body { font-family: "Linux Libertine", serif; }</style> 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/katex.min.css" integrity="sha384-zTROYFVGOfTw7JV7KUu8udsvW2fx4lWOsCEDqhBreBwlHI4ioVRtmIvEThzJHGET" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/katex.min.js" integrity="sha384-GxNFqL3r9uRJQhR+47eDxuPoNE7yLftQM8LcxzgS4HT73tp970WS/wV5p8UzCOmb" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+  </head>
+  
+  <body class="ck-content">
+     <h1>Введение в криптографию</h1>
+
+    <ul>
+      <li><a href="http://cryptography.ru/wp-content/uploads/2013/09/intro_to_crypto.pdf">Введение в криптографию. Под редакцией В.В.Ященко</a>,
+        глава 4 (стр. 123)</li>
+    </ul>
+    <h2>Небольшой пример</h2>
+    <p>Имеется сейф, нужно разделить код между двумя владельцами. Пусть есть
+      брокер, который поможет в этом.</p>
+    <p>Идея 1: просто разделить длинный код пополам. Проблема в том, что тогда
+      каждый владелец ключа обладает <strong>уже</strong> некоторой информацией
+      о полном ключе (половину ключа) и способен восстановить оставшуюся сравнительно
+      быстро.
+      <br><strong>Хочется</strong>: чтобы он не обладал вовсе никакой информацией
+      о полном ключе.</p>
+    <p>Идея 2: Брокер разделяет ключ S на два&nbsp;<span class="math-tex">\(A,B ∈ ℤ : S = A + B\)</span>.
+      Тогда зная только A нельзя получить никакой информации о S.</p>
+    <p>Теперь хочется всё это дело развить на большое количество участников и
+      более сложные ситуации.</p>
+    <h2>Определения</h2>
+    <p><strong>СРС</strong> — схема, разделяющая секрет. Распределяет секрет между
+      участниками таким образом, что только заранее заданные подмножества участников
+      могут получить доступ к секрету.</p>
+    <p><strong>(n, k)-СРС </strong>— Любые&nbsp;<span class="math-tex">\(k\)</span>&nbsp;участников
+      могут восстановить доступ к секрету по&nbsp;<span class="math-tex">\(k\)</span>&nbsp;<u>к</u>усочкам.</p>
+    <p><strong>Структура доступа</strong> — подмножества участников, которые могут
+      однозначно восстановить секрет.</p>
+    <p><strong>Совершенная СРС</strong> — никакие другие подмножества не могут
+      получить какой-то информации о самом секрете. Они-то нам и интересны.</p>
+    <p><strong>Идеальная СРС</strong> — «размер» информации,
+      <br>предоставляемой участнику, не больше «размера» секрета (а меньше он и
+      не может быть; доказательство см. в&nbsp;<a class="reference-link" href="On%20secret%20sharing%20systems.html"
+      data-note-path="root/2C0iPZniLb0e/64kEKvAm2lE0/0Ed5oCZBuJSU">On secret sharing systems</a>).</p>
+    <p><strong>Несущественный участник</strong> — если&nbsp;<span class="math-tex">\(∀A∈Γ\quad x∉A\)</span>,
+      т.е. они не входят ни в одно разрешенное множество. Им можно не посылать
+      никаких кусочков, без потери общности будем считать, что таких нет.&nbsp;</p>
+    <h2>Терминология и обозначения</h2>
+    <p>Мне очень нравятся обозначения из&nbsp;<a class="reference-link" href="On%20secret%20sharing%20systems.html"
+      data-note-path="root/2C0iPZniLb0e/64kEKvAm2lE0/0Ed5oCZBuJSU">On secret sharing systems</a>,
+      поэтому буду использовать их.</p>
+    <ul>
+      <li><span class="math-tex">\(s∈S\)</span>&nbsp;— сам секрет.</li>
+      <li><span class="math-tex">\(v∈V\)</span>&nbsp;— кусочек (piece) секрета.
+        Также известно как акция/share или проекция/тень/shadow.</li>
+      <li><span class="math-tex">\(Γ\)</span>&nbsp;— структура доступа.</li>
+      <li><span class="math-tex">\(A\)</span>&nbsp;— некоторое подмножество участников.</li>
+    </ul>
+    <h2>Начало</h2>
+    <p>В 1979 году Г. Блейкли [1] и А. Шамир [2] разобрали случай (n, k)-СРС.
+      Что выяснилось:</p>
+    <ol>
+      <li>Не для всякой структуры доступа можно построить <strong>идеальную</strong> СРС
+        <span
+        style="background-color:hsl(30,75%,60%);">(связь с матроидами)</span>
+      </li>
+      <li>Но всегда можно построить <strong>совершенную</strong> СРС. Хотя и неэффективно.</li>
+    </ol>
+    <h2>Линейная СРС</h2>
+    <p>Пусть есть векторное пространство&nbsp;<span class="math-tex">\(L\)</span>&nbsp;над
+      полем&nbsp;<span class="math-tex">\(K\)</span>, и семейство подпространств&nbsp;
+      <span
+      class="math-tex">\(\{L_0, …, L_n\}\)</span>.</p>
+    <p>Определим свойство <strong>«всё или ничего»</strong>:</p><span class="math-tex">\[∀A⊂\{1,…,n\}\quad \mathrm{L}(\{L_i\mid i∈A\}) ∩ L_0 = \begin{cases}\vec{0},\\L_0\end{cases}\]</span>
+    <ol>
+      <li>Выберем какие-то <u>любые</u> номера подпространств, кроме нулевого:&nbsp;
+        <span
+        class="math-tex">\(A ⊂ \{1,…,n\}\)</span>
+      </li>
+      <li>Рассмотрим линейную оболочку этих подпространств&nbsp;<span class="math-tex">\(\{L_i \mid i∈A\}\)</span>
+      </li>
+      <li>Тогда линейная оболочка <strong>либо</strong> содержит в себе&nbsp;
+        <span
+        class="math-tex">\(L_0\)</span>&nbsp;целиком, <strong>либо</strong> пересекается с ним в
+          нуле. Всё или ничего.</li>
+    </ol>
+    <p>Это семейство задаёт <strong>«линейную» СРС</strong>, у которой&nbsp;
+      <span
+      class="math-tex">\(A\)</span>&nbsp;— разрешённое множество ⇔ в пересечении стоит всё подпространство.</p>
+    <p>Сформулирем интересный вопрос. Пусть поле конечно (<span class="math-tex">\(|K| = q\)</span>),
+      например это&nbsp;<span class="math-tex">\(ℤ_2^8\)</span>&nbsp;(байты).
+      И пусть подпространства&nbsp;<span class="math-tex">\(L_i\)</span>&nbsp;одномерны,
+      например это строки байтов.
+      <br>Тогда возниакет вопрос — каково максимальное возможное число участников&nbsp;
+      <span
+      class="math-tex">\(n\)</span>&nbsp;в (n,k)-СРС (<span class="math-tex">\(k&gt;1\)</span>)?
+        Т.е. какое максимальное число&nbsp;<span class="math-tex">\(n\)</span>&nbsp;можно
+        взять, чтобы для семейства&nbsp;<span class="math-tex">\(L_i\)</span>&nbsp;выполнялось
+        свойство «всё или ничего».</p>
+    <p>Переформулируем. <span style="background-color:hsl(30,75%,60%);">TODO</span>
+    </p>
+    <h2>Разделение секрета для произвольных структур доступа</h2>
+    <p>Структура доступа&nbsp;<span class="math-tex">\(Γ\)</span>&nbsp;— такое
+      множество, что&nbsp;<span class="math-tex">\(A∈Γ\)</span>&nbsp;тогда и
+      только тогда, когда&nbsp;<span class="math-tex">\(A\)</span>&nbsp;— разрешённое
+      множество. Будем также считать, что если&nbsp;<span class="math-tex">\(A∈Γ\)</span>,
+      то и всякое&nbsp;<span class="math-tex">\(B⊇A\)</span>&nbsp;тоже разрешённое.
+      Такая структура доступа называется монотонной. Было бы неразумно, чтобы
+      группа участников могла раскрыть секрет, но та же группа с кем-то ещё —
+      уже нет.</p>
+    <p>Формальное определение схемы разделения секрета (при помощи энтропии).</p>
+    <p>Пара&nbsp;<span class="math-tex">\((P, S)\)</span>&nbsp;называется совершенной
+      вероятностной СРС, реализующей структуру доступа&nbsp;<span class="math-tex">\(Γ\)</span>,
+      если</p><span class="math-tex">\[H(s \mid v_i, i∈A) = \begin{cases}0, &amp;A∈Γ\\H(s),&amp; A∉Γ\end{cases}\]</span>
+    <p>Другими словами, энтропия секрета при условии знания «правильных»&nbsp;
+      <span
+      class="math-tex">\(v_i\)</span>&nbsp;равна нулю, т.е. можно достоверно его вычислить. А
+        знание каких-либо других («неправльных») кусочков никак не влияет на вероятность
+        угадать секрет, т.е. не даёт никакой дополнительной информации.</p>
+    <p>Или, используя распределение вероятностей:</p><span class="math-tex">\[P(s=c_0 \mid v_i=c_i, i∈A) = \begin{cases}0 \text{ или }1,&amp;A∈Γ\\P(s=c_0), &amp;A∉Γ\end{cases}\]</span>
+    <p>Т.е. условная вероятность того, что&nbsp;<span class="math-tex">\(s = c_0\)</span>&nbsp;равна
+      0 или 1, если известны все «правильные» кусочки. Т.е. достоверно известно,
+      выполняется ли равенство&nbsp;<span class="math-tex">\(s=c_0\)</span>.
+      Если же кусочки не известны, то вероятность точно такая же, как если бы
+      вовсе не было известно ни одного кусочка.</p>
+    <h3>Примеры</h3>
+    <h4>Пример 1: проекция</h4>
+    <p>Пусть есть чёрный ящик, внутри которого лежит секрет. Общеизвестно, что
+      секрет может быть шаром, циллиндром или кубом (таково множество&nbsp;
+      <span
+      class="math-tex">\(S\)</span>). Три участника по отдельности получают проекции объекта
+        на грани ящика (<span class="math-tex">\(V\)</span>&nbsp;содержит круг
+        и квадрат).</p>
+    <figure class="image image_resized" style="width:50%;">
+      <img src="%D0%92%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%B2%20%D0%BA%D1%80%D0%B8%D0%BF%D1%82%D0%BE%D0%B3%D1%80%D0%B0%D1%84%D0%B8%D1%8E/projections.gif">
+    </figure>
+    <p>Ни один участник не может достоверно восстановить форму объекта в ящике.,
+      но вместе они на это способны. Однако это схема не является совершенной,
+      поскольку если любой участник видит квадрат, то это означает что внутри
+      ящика не содержится шар. Он получил дополнительную информацию. Строго говоря,
+      в таком случае получаем&nbsp;<span class="math-tex">\(P(s=\text{шар} \mid \text{виден квадрат}) = 0 ≠ P(s=\text{шар})\)</span>.</p>
+    <h4>Пример 2:&nbsp;<span class="math-tex">\((n, n)\)</span>-СРС</h4>
+    <p>Построим схему, в которой только все участники вместе могут восстановить
+      секрет, но при этом никакое подмножество не может получить никакой дополнительной
+      информации.</p>
+    <p>Во введении описывалась идея, в которой секрет&nbsp;<span class="math-tex">\(s\)</span>&nbsp;разделяется
+      на слагаемые:&nbsp;<span class="math-tex">\(s = v_1 + v_2 + … + v_n\)</span>.
+      Проверим для него свойства:</p>
+    <ol>
+      <li>Да, зная все&nbsp;<span class="math-tex">\(v_i\)</span>&nbsp;можно с легкостью
+        достоверно восстановить секрет.</li>
+      <li><span style="background-color:hsl(30,75%,60%);">TODO</span>
+      </li>
+    </ol>
+    <p>Этот пример легко развить до схемы, соответствующей любой структуре доступа.
+      Для каждого разрешённого множества&nbsp;<span class="math-tex">\(A∈Γ\)</span>&nbsp;разделим
+      секрет на&nbsp;<span class="math-tex">\(|A|\)</span>&nbsp;кусочков. Каждому
+      участнику из&nbsp;<span class="math-tex">\(A\)</span>&nbsp;дадим один из
+      кусочков. После этого у всех участников на руках будет не более&nbsp;
+      <span
+      class="math-tex">\(|Γ|\)</span>&nbsp;кусочков, каждый соответствует одному из разрешенных
+        подмножеств.</p>
+    <p>Очевидно, эта схема отнюдь не является эффективной. Её можно несколько
+      соптимизировать, используя минимальные множества, но всё равно для&nbsp;
+      <span
+      class="math-tex">\((n, n/2)\)</span>-СРС общий размер кусочков одного участника будет в&nbsp;
+        <span
+        class="math-tex">\(C^{n/2}_n \sim 2^n/\sqrt{2πn}\)</span>&nbsp;раз больше размера самого
+          секрета (<span style="background-color:hsl(30,75%,60%);">TODO: Откуда число?</span>).&nbsp;</p>
+    <h2>Комбинаторный подход <span style="background-color:hsl(30,75%,60%);">(фуфло)</span></h2>
+    <p>Ранее описывался подход со стороны теории вероятностей, теперь рассмотрим
+      это же, но со стороны комбинаторики.</p>
+    <p>Матрица&nbsp;<span class="math-tex">\(V\)</span>&nbsp;описывает <strong>схему</strong> распределения
+      секрета (она не зависит от секрета), если её строки имеют вид&nbsp;
+      <span
+      class="math-tex">\(\mathbf{v} = (s,v_1…,v_n)\)</span>. Т.е. каждая строка описывает то,
+        как один некоторый секрет может быть разделён на кусочки. Тогда чтобы разделить
+        некоторый секрет&nbsp;<span class="math-tex">\(s_0\)</span>, дилер случайно
+        и равновероятно выбирает строку из матрицы с&nbsp;<span class="math-tex">\(s = s_0\)</span>&nbsp;(соответствующую
+        требуемому секрету).</p>
+    <p><span style="background-color:hsl(30,75%,60%);">Вопрос</span>: почему
+      тут&nbsp;<span class="math-tex">\(n\)</span>&nbsp;столбцов, а не&nbsp;
+      <span
+      class="math-tex">\(k\)</span>?</p>
+    <p>Определим когда матрица описывает <strong>совершенную</strong> схему. Множество&nbsp;
+      <span
+      class="math-tex">\(A\)</span>&nbsp;содержит координаты элементов любой строки (т.е. числа&nbsp;
+        <span
+        class="math-tex">\(1…n\)</span>).</p>
+    <ol>
+      <li>Если&nbsp;<span class="math-tex">\(A∈Γ\)</span>, то для любой строки столбец&nbsp;
+        <span
+        class="math-tex">\(s\)</span>&nbsp;из однозначно определяется по значениям элементов с
+          этими координатами (из этой же строки).</li>
+      <li>Если же&nbsp;<span class="math-tex">\(A∉Γ\)</span>, то число строк с заданными
+        координатами этих значений никак не зависит от элемента&nbsp;<span class="math-tex">\(s\)</span>&nbsp;этой
+        строки.</li>
+    </ol>
+    <p><span style="background-color:hsl(30,75%,60%);">TODO</span>: Я-то понял,
+      но определения страшно непонятные. Надо переписать.</p>
+    <h4>Пример 2: комбинаторная версия</h4>
+    <p>Напомню, мы разделяли секрет таким образом:&nbsp;<span class="math-tex">\(s = v_1 + v_2 + … + v_n\)</span>.
+      Это свойство выполняется для каждой строки матрицы СРС. Можно переписать
+      по-другому:&nbsp;<span class="math-tex">\(-s + v_1 + … + v_n = 0\)</span>.</p>
+    <p>Теперь докажем совершенность:</p>
+    <ol>
+      <li>Да, по столбцам можно восстановить секрет.</li>
+      <li>Если заданы только&nbsp;<span class="math-tex">\(r &lt; n\)</span>&nbsp;координат,
+        то существует&nbsp;<span class="math-tex">\(|V|^{n - r}\)</span>&nbsp;строк
+        матрицы с заданным значением&nbsp;<span class="math-tex">\(s\)</span>.</li>
+    </ol>
+    <p><span style="background-color:hsl(30,75%,60%);">TODO</span>: Я что-то
+      написал, но не понял что…</p>
+    <h2>Линейное разделение секрета</h2>
+    <p>Наконец переходим к чему-то полезному. <a href="%D0%A1%D1%85%D0%B5%D0%BC%D0%B0%20%D0%A8%D0%B0%D0%BC%D0%B8%D1%80%D0%B0.html">Схема Шамира</a> подробно
+      описана по ссылке, здесь же будем доказывать некоторые утверждения.</p>
+    <p><span style="background-color:hsl(30,75%,60%);">TODO</span>
+    </p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+  </body>
+
+</html>

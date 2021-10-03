@@ -1,0 +1,149 @@
+<!doctype html>
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../style.css">
+    
+<link href="https://rawcdn.githack.com/iliakonnov/linlibertine/718d3ae934bec3bb1cb173af93ad22a42362c266/linlibertine.css" rel="stylesheet"> 
+<style>body { font-family: "Linux Libertine", serif; }</style> 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/katex.min.css" integrity="sha384-zTROYFVGOfTw7JV7KUu8udsvW2fx4lWOsCEDqhBreBwlHI4ioVRtmIvEThzJHGET" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/katex.min.js" integrity="sha384-GxNFqL3r9uRJQhR+47eDxuPoNE7yLftQM8LcxzgS4HT73tp970WS/wV5p8UzCOmb" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+  </head>
+  
+  <body class="ck-content">
+     <h1>Монотонные булевы функции</h1>
+
+    <p>Схема Шамира, конечно, хороша, но что если мы хотим задавать какие-то
+      более сложные структуры доступа?</p>
+    <ul>
+      <li>Benaloh, Josh, and Jerry Leichter. "<a href="https://link.springer.com/content/pdf/10.1007/0-387-34799-2_3.pdf">Generalized secret sharing and monotone functions</a>."
+        Conference on the Theory and Application of Cryptography. Springer, New
+        York, NY, 1988.</li>
+    </ul>
+    <h2>Идея</h2>
+    <p>Идея заключается в том, чтобы задавать структуру доступа в виде логической
+      формулы, в которой каждая переменная представляет одного из участников,
+      и вся формула истинна только тогда, когда хотя бы одна правильная группа
+      участников набралась. Каждая <u>монотонная</u> формула может быть построена
+      при помощи AND и OR, но как именно её строить?</p>
+    <ol>
+      <li>Если хотим, чтобы&nbsp;<span class="math-tex">\(p_1\)</span>&nbsp;и&nbsp;
+        <span
+        class="math-tex">\(p_2\)</span>&nbsp;<strong>только вместе</strong> могли восстановить секрет&nbsp;
+          <span
+          class="math-tex">\(s\)</span>, то надо дать им кусочки&nbsp;<span class="math-tex">\(v_1\)</span>&nbsp;и&nbsp;
+            <span
+            class="math-tex">\(v_2\)</span>, такие что&nbsp;<span class="math-tex">\(s = v_1 + v_2\)</span>
+      </li>
+      <li>Если же хотим, чтобы они могли восстановить <strong>независимо друг от друга</strong>,
+        то дадим им&nbsp;<span class="math-tex">\(v_1 = v_2 = s\)</span>
+      </li>
+    </ol>
+    <p>На основе двух этих операций можно построить любую нужную формулу.</p>
+    <blockquote>
+      <p>Булева функция называется монотонной, если из того, что она принимает
+        значений 1 на некотором наборе аргументов&nbsp;<span class="math-tex">\(a\)</span>,
+        следует то, что она принимает значение 1 и на любом наборе аргументов&nbsp;
+        <span
+        class="math-tex">\(b\)</span>, который получается путем замены в&nbsp;<span class="math-tex">\(a\)</span>&nbsp;произвольного
+          числа нулей на единицы.</p><span class="math-tex">\[∀a,b \quad a \preccurlyeq b \implies f(a) ≤ f(b)\]</span>
+    </blockquote>
+    <h2>Пример</h2>
+    <p>Пусть мы хотим такую структуру&nbsp;<span class="math-tex">\(Γ = \{ \{a, b\}, \{c, d\} \}\)</span>,
+      т.е. либо&nbsp;<span class="math-tex">\(a\)</span>&nbsp;и&nbsp;<span class="math-tex">\(b\)</span>&nbsp;вместе,
+      либо&nbsp;<span class="math-tex">\(c\)</span>&nbsp;и&nbsp;<span class="math-tex">\(d\)</span>&nbsp;вместе.
+      Запишем это в виде формулы:&nbsp;<span class="math-tex">\((a∧b)∨(c ∧ d)\)</span>.
+      Теперь разделим секреты.</p>
+    <ol>
+      <li><span class="math-tex">\(s = v_{a∧b} = v_{c∧d}\)</span>
+      </li>
+      <li><span class="math-tex">\(v_{a∧b} = v_a + v_b\)</span>
+      </li>
+      <li><span class="math-tex">\(v_{c∧d} = v_c + v_d\)</span>
+      </li>
+    </ol>
+    <p>Отсюда получаем, что&nbsp;<span class="math-tex">\(s = v_a + v_b = v_c + v_d\)</span>,
+      где все кусочки генерируются независимо и случайно.</p>
+    <h2>Теорема 1</h2>
+    <p>Существует монотонная структура доступа, которую нельзя реализовать при
+      помощи никакой пороговой схемы.</p>
+    <p>Рассмотрим ту же структуру:&nbsp;<span class="math-tex">\(Γ = \{ \{a, b\}, \{c, d\} \}\)</span>.
+      Пусть участники получают по&nbsp;<span class="math-tex">\(w_a, w_b, w_c, w_d\)</span>&nbsp;кусочков
+      соответственно. Поскольку&nbsp;<span class="math-tex">\(a\)</span>&nbsp;и&nbsp;
+      <span
+      class="math-tex">\(b\)</span>&nbsp;могут восстановить секрет, то&nbsp;<span class="math-tex">\(w_a + w_b ≥ k\)</span>,
+        где&nbsp;<span class="math-tex">\(k\)</span>&nbsp;— порог схемы. Аналогично&nbsp;
+        <span
+        class="math-tex">\(w_c + w_d ≥ k\)</span>.</p>
+    <p>Будем считать, что&nbsp;<span class="math-tex">\(w_a ≥ w_b\)</span>&nbsp;и&nbsp;
+      <span
+      class="math-tex">\(w_c ≥ w_d\)</span>. &nbsp;Отсюда&nbsp;<span class="math-tex">\(w_a + w_a ≥ w_a + w_b ≥ k\)</span>,
+        т.е.&nbsp;<span class="math-tex">\(w_a ≥ k/2\)</span>. Аналогично&nbsp;
+        <span
+        class="math-tex">\(w_c ≥ k/2\)</span>. Отсюда получаем, что&nbsp;<span class="math-tex">\(w_a + w_c ≥ k\)</span>,
+          т.е.&nbsp;<span class="math-tex">\(a\)</span>&nbsp;и&nbsp;<span class="math-tex">\(c\)</span>&nbsp;вместе
+          могут восстановить секрет. Но ведь структура доступа это запрещает! Таким
+          образом, её нельзя реализовать только используя&nbsp;<span class="math-tex">\((n,k)\)</span>-пороговую
+          схему.</p>
+    <h2>Формальное определение</h2>
+    <p>Теперь хотим формально описать схему, описанную в идее. Для этого введём
+      обозначение:&nbsp;<span class="math-tex">\(\$(s;p_1,…,p_n)\)</span>&nbsp;—
+      функция, которая распределяет кусочки&nbsp;<span class="math-tex">\(\{s_1, …, s_n\}\)</span>&nbsp;между
+      участниками&nbsp;<span class="math-tex">\(p_1, …, p_n\)</span>. Теперь
+      определим искомую&nbsp;<span class="math-tex">\(\$(s; F)\)</span>&nbsp;для
+      булевой функции&nbsp;<span class="math-tex">\(F\)</span>.</p>
+    <ol>
+      <li><span class="math-tex">\(\$(s; v_i)\)</span>&nbsp;передаёт участнику&nbsp;
+        <span
+        class="math-tex">\(p_i\)</span>&nbsp;его кусочек&nbsp;<span class="math-tex">\(v_i\)</span>
+      </li>
+      <li><span class="math-tex">\(\$(s; a∨b) = \$(s; a) ∪\$(s; b)\)</span>&nbsp;—
+        раздаём тот же секрет и тем, и другим.</li>
+      <li><span class="math-tex">\(\$(s; a∧b) = \$(s_1;a)∪\$(s_2;b)\)</span>&nbsp;—
+        разделяет секрет&nbsp;<span class="math-tex">\(s=s_1+s_2\)</span>&nbsp;и
+        раздаёт каждому свой кусочек.</li>
+    </ol>
+    <p>Аналогично обобщается на большее количество аргументов у булевых операторов&nbsp;
+      <span
+      class="math-tex">\(a∨b∨c∨…\)</span>
+    </p>
+    <h2>Интеграция с традиционными СРС</h2>
+    <p>Разделение при помощи сумм гибко, но не очень эффективно. Удобно, чтобы
+      мы могли также использовать, например, эффективную схему Шамира, там где
+      это возможно.</p>
+    <p>Для этого добавим в нашу определяющую схему доступа функцию, оператор&nbsp;
+      <span
+      class="math-tex">\(\mathtt{THRESHOLD}_k(p_1, p_2, …, p_n)\)</span>, который принимает значение&nbsp;
+        <span
+        class="math-tex">\(1\)</span>&nbsp;тогда, когда хотя бы&nbsp;<span class="math-tex">\(k\)</span>&nbsp;из
+          перечисленных участников присутствуют. Т.е. обычная&nbsp;<span class="math-tex">\((n,k)\)</span>-СРС.</p>
+    <p>Теперь интегрируем это в нашу систему.&nbsp;</p><span class="math-tex">\[\$(s; \mathtt{THRESHOLD}_k(F_1,…,F_n)) = \bigcup_{1≤i≤n} \$(s_i; F_i)\]</span>
+    <p>где&nbsp;<span class="math-tex">\(s_i\)</span>&nbsp;— кусочек, полученный
+      в результате применения эффективной схемы для разделения секрета&nbsp;
+      <span
+      class="math-tex">\(s\)</span>.</p>
+    <p>Т.е. здесь мы просто разделяем каждый полученный кусочек при помощи соответствующей
+      функции по описанной выше схеме.</p>
+    <h2>Доказательство корректности</h2>
+    <p>Я не буду описывать строгое доказательство, только опишу идею. Достаточно
+      показать, что каждое из перечисленных определений&nbsp;<span class="math-tex">\(\$\)</span>&nbsp;распределяет
+      секрет в соответствии с той формулой, к которой он применяется. Это довольно
+      очевидно, ведь с идеей разделения при помощи сумм мы уже давно знакомы.
+      После чего по индукции эта схема верна для любой монотонной функции.</p>
+    <h2>Заключение</h2>
+    <p>Эта схема позволяет гораздо более эффективно реализовывать сложные структуры
+      доступа, хотя и не всегда. Большинство структур всё также требуют экспоненциального
+      роста количества кусочков.</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+  </body>
+
+</html>
