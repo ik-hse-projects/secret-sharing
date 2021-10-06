@@ -1,0 +1,202 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<title>Secret sharing</title>
+
+	<link rel="stylesheet" href="reveal/reset.css">
+	<link rel="stylesheet" href="reveal/reveal.css">
+	<link id="theme" rel="stylesheet" href="reveal/theme/black.css">
+
+	<style>
+		cite {
+			display: none;
+		}
+		.slides {
+			border: thin solid var(--r-main-color);
+		}
+		.r-stretch > div {
+			height: 100%;
+		}
+		.r-stretch > div > svg {
+			min-height: 100%;
+			min-width: 100%;
+		}
+		#cite {
+			position: fixed;
+			bottom: 12px;
+			left: 12px;
+			font-size: small;
+			color: var(--r-main-color);
+			opacity: 0.70;
+		}
+		.MathJax_Display {
+			margin: 0 !important;
+		}
+		.reveal p {
+			text-align: left;
+		}
+		.reveal ul {
+			display: block;
+		}
+		.reveal ol {
+			display: block;
+		}
+		.reveal section.img_container {
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				padding: 0;
+		}
+		.reveal section img {
+				display: block;
+				margin: auto;
+				height: auto;
+				max-height: 100%;
+				width: auto;
+				max-width: 100%;
+		}
+		.columns {
+			display: flex;
+		}
+		.columns > .col {
+			flex: 1;
+		}
+		.columns > p:first-child {
+			margin-right: 1em;
+		}
+		.columns > p:last-child {
+			margin-left: 1em;
+		}
+		.columns > .col > ol {
+			margin: var(--r-block-margin) 0 var(--r-block-margin) 1em;
+		}
+		svg {
+			height: 100%;
+			width: 100%;
+		}
+		.scrollable-slide {
+			overflow-y: auto !important;
+		}
+		::-webkit-scrollbar {
+			width: 6px;
+		}
+		::-webkit-scrollbar-track {
+			-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+		}
+		::-webkit-scrollbar-thumb {
+			background-color: #333;
+		}
+		::-webkit-scrollbar-corner {
+			background-color: #333;
+		}
+	</style>
+</head>
+<body>
+	<div class="reveal">
+		<div id="cite"></div>
+		<div class="slides">
+			<section data-markdown
+			data-separator="^\n\*\*\*\n"
+			data-separator-vertical="^\n---\n"
+			data-separator-notes="^Notes:">
+			<script type="text/template">
+<%+ slides.md %>
+			</script>
+		</section>
+	</div>
+</div>
+
+<script src="reveal/reveal.js"></script>
+<script src="reveal/plugin/notes/notes.js"></script>
+<script src="reveal/plugin/markdown/markdown.js"></script>
+<script src="reveal/plugin/math/math.js"></script>
+<script>
+	Reveal.initialize({
+		width: 1920 / 1.2,
+		height: 1080 / 1.2,
+		hash: true,
+		math: {
+			mathjax: 'https://cdn.jsdelivr.net/gh/mathjax/mathjax@2.7.8/MathJax.js',
+			config: 'TeX-AMS_HTML-full',
+			TeX: { Macros: { RR: "{\\bf R}" } }
+		},
+		markdown: {
+			smartypants: true,
+			smartLists: true,
+		},
+		keyboard: {
+			90: function(e) {
+				let theme = document.getElementById('theme');
+				if (theme.getAttribute('href') === 'reveal/theme/white.css') {
+					theme.setAttribute('href','reveal/theme/black.css');
+				} else {
+					theme.setAttribute('href','reveal/theme/white.css');
+				}
+			}
+		},
+		plugins: [ RevealMarkdown, RevealMath, RevealNotes ],
+		slideNumber: 'c/t',
+		showNotes: true,
+		totalTime: 80 * 60,
+		transitionSpeed: 'fast',
+		pdfSeparateFragments: false,
+		viewDistance: 5,
+		center: false,
+		controls: false,
+	});
+	function patchSvg(obj) {
+		if (!obj.dataset.was_display) {
+			obj.dataset.was_display = obj.style.display || 'unset';
+			obj.style.display = 'none';
+		}
+		let sty = x => getComputedStyle(document.querySelector('object[type="image/svg+xml"]')).getPropertyValue(x);
+		let doc = obj.contentDocument;
+		let is_any = false;
+		if (!!doc) {
+			for (let svg of doc.querySelectorAll("svg")) {
+				is_any = true;
+				svg.setAttribute("style", `--r-background-color: ${sty('--r-background-color')}`);
+			}
+		}
+		if (!is_any) {
+			obj.addEventListener('load', () => patchSvg(obj))
+		} else {
+			obj.style.display = obj.dataset.was_display;
+		}
+	}
+	function update(event) {
+		let cite = event.currentSlide.querySelector("cite");
+		let text = (cite && cite.textContent) || "";
+		document.getElementById("cite").textContent = text;
+
+		for (let obj of document.querySelectorAll('object[type="image/svg+xml"]')) {
+			patchSvg(obj);
+		}
+	}
+	Reveal.on('ready', update);
+	Reveal.on('slidechanged', update);
+
+	function resetSlideScrolling(slide) {
+		slide.classList.remove('scrollable-slide');
+	}
+	function handleSlideScrolling(slide) {
+		if (slide.scrollHeight >= Reveal.getConfig().height) {
+			slide.classList.add('scrollable-slide');
+			slide.style.height = Reveal.getConfig().height + 'px';
+		}
+	}
+	Reveal.addEventListener('ready', function (event) {
+		handleSlideScrolling(event.currentSlide);
+	});
+	Reveal.addEventListener('slidechanged', function (event) {
+		if (event.previousSlide) {
+			resetSlideScrolling(event.previousSlide);
+		}
+		handleSlideScrolling(event.currentSlide);
+	});
+</script>
+</body>
+</html>

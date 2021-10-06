@@ -8,4 +8,4 @@
 ## Материалы
 
 - [Desktop](materials/index.html)
-- [Mobile](materials/Схемы%20разделённого%20секрета.html)
+- [Mobile](materials/Схемы%20раздёленного%20секрета.html)
