@@ -10,11 +10,22 @@
 	<link rel="stylesheet" href="reveal/reveal.css">
 	<link id="theme" rel="stylesheet" href="reveal/theme/black.css">
 
+	<link rel="stylesheet" href="fonts/linlibertine/linlibertine.css">
+	<link rel="stylesheet" href="fonts/noto-sans/noto-sans.css">
+	<link rel="stylesheet" href="fonts/roboto/roboto.css">
+
+	<style>
+		:root {
+			--r-main-font: "Libertinus Sans";
+			--r-heading-font: "Libertinus Serif Display";
+		}
+	</style>
+
 	<style>
 		cite {
 			display: none;
 		}
-		.slides {
+		.reveal.show-notes > .slides {
 			border: thin solid var(--r-main-color);
 		}
 		.r-stretch > div {
@@ -24,15 +35,46 @@
 			min-height: 100%;
 			min-width: 100%;
 		}
-		#cite {
+		.reveal span.r-stack {
+			display: inline-grid;
+		}
+		.side-elem {
+			z-index: 100;
 			position: fixed;
-			bottom: 12px;
 			left: 12px;
 			font-size: small;
 			color: var(--r-main-color);
+			background-color: var(--r-background-color);
 			opacity: 0.70;
 		}
-		.MathJax_Display {
+
+		.reveal .pause-overlay {
+			background-color: var(--r-background-color);
+		}
+
+		.reveal .slides section .fragment.semi-highlight {
+			opacity: 0.5;
+			visibility: inherit;
+		}
+		.reveal .slides section .fragment.semi-highlight.current-fragment {
+			opacity: 1;
+		}
+
+		#setup {
+			top: 12px;
+			display: none;
+		}
+		.reveal.show-notes > #setup {
+			display: unset;
+		}
+		#cite {
+			bottom: 12px;
+		}
+		#cite a:hover, #cite a:visited, #cite a:active, #cite a:link {
+			color: inherit;
+  			text-decoration: none;
+		}
+		.MJXc-display, .MathJax_Display {
 			margin: 0 !important;
 		}
 		.reveal p {
@@ -43,6 +85,14 @@
 		}
 		.reveal ol {
 			display: block;
+		}
+		.reveal blockquote {
+			width: 85%;
+		}
+		.reveal ::selection {
+			color: reset;
+			background: #ff9966;
+			text-shadow: none;
 		}
 		.reveal section.img_container {
 				width: 100%;
@@ -57,6 +107,18 @@
 				max-height: 100%;
 				width: auto;
 				max-width: 100%;
+		}
+		@media screen and (orientation: portrait) {
+			.reveal.show-notes .speaker-notes {
+				top: 100%;
+				left: 0;
+				height: 50vh;
+				width: 100%;
+			}
+			.reveal.show-notes {
+				max-width: none;
+				max-height: 50vh;
+			}
 		}
 		.columns {
 			display: flex;
@@ -80,6 +142,9 @@
 		.scrollable-slide {
 			overflow-y: auto !important;
 		}
+		/*.reveal-viewport {
+			overflow-y: auto;
+		}*/
 		::-webkit-scrollbar {
 			width: 6px;
 		}
@@ -96,7 +161,24 @@
 </head>
 <body>
 	<div class="reveal">
-		<div id="cite"></div>
+		<div id="setup" class="side-elem">
+			<select onchange="document.documentElement.style.setProperty('--r-main-font', this.value)">
+				<option value="sans-serif" disabled selected>Шрифт</option>
+				<option value="Libertinus Sans">Без засечек</option>
+				<option value="Libertinus Serif">С засечками</option>
+				<option value="Noto Sans">Noto Sans</option>
+				<option value="Roboto">Roboto</option>
+			</select>
+			<select onchange="document.getElementById('theme').setAttribute('href', this.value)">
+				<option value="reveal/theme/white.css" disabled selected>Тема</option>
+				<option value="reveal/theme/white.css">Светло</option>
+				<option value="reveal/theme/black.css">Темно</option>
+			</select>
+			<span>
+				Презентацию листать при помощи пробела, с шифтом чтобы назад. За справкой нажми <kbd>?</kbd>
+			</span>
+		</div>
+		<div id="cite" class="side-elem"></div>
 		<div class="slides">
 			<section data-markdown
 			data-separator="^\n\*\*\*\n"
@@ -109,6 +191,15 @@
 	</div>
 </div>
 
+<script src="nerdamer/nerdamer.core.js"></script>
+<script src="nerdamer/Algebra.js"></script>
+<script src="nerdamer/Calculus.js"></script>
+<script src="nerdamer/Solve.js"></script>
+
+<script src="math/math.js"></script>
+<script src="math/function-plot.js"></script>
+<script src="presentation.js"></script>
+
 <script src="reveal/reveal.js"></script>
 <script src="reveal/plugin/notes/notes.js"></script>
 <script src="reveal/plugin/markdown/markdown.js"></script>
@@ -119,9 +210,15 @@
 		height: 1080 / 1.2,
 		hash: true,
 		math: {
-			mathjax: 'https://cdn.jsdelivr.net/gh/mathjax/mathjax@2.7.8/MathJax.js',
-			config: 'TeX-AMS_HTML-full',
-			TeX: { Macros: { RR: "{\\bf R}" } }
+			mathjax: 'MathJax/MathJax.js',
+			config: 'TeX-AMS_CHTML-full',
+			TeX: { Macros: { RR: "{\\bf R}" } },
+			"fast-preview": {
+				disabled: true,
+			},
+			"CommonHTML": {
+				minScaleAdjust: 100,
+			},
 		},
 		markdown: {
 			smartypants: true,
@@ -140,13 +237,76 @@
 		plugins: [ RevealMarkdown, RevealMath, RevealNotes ],
 		slideNumber: 'c/t',
 		showNotes: true,
-		totalTime: 80 * 60,
+		totalTime: 70 * 60,
 		transitionSpeed: 'fast',
-		pdfSeparateFragments: false,
 		viewDistance: 5,
 		center: false,
 		controls: false,
 	});
+	function computeTimings() {
+		let perSlide = [];
+		let totalWords = 0;
+		for (let slide of Reveal.getSlides()) {
+			let notes = document.createElement('span');
+			notes.innerHTML = Reveal.getSlideNotes(slide);
+			let text = notes.textContent || notes.innerText;
+			let words = text.match(/[\p{L}\p{Nd}’'-]+/gui);
+			let length = (words && words.length) || 0;
+
+			if (length) {
+				perSlide.push({
+					slide: slide,
+					length: length,
+					text: text,
+					words: words,
+				});
+				totalWords += length;
+			} else {
+				console.log(`Slide do not have any words`);
+				console.log(slide);
+			}
+		}
+		let totalTime = Reveal.getConfig().totalTime;
+		let words_per_second = totalWords / totalTime;
+		console.log(`Total ${totalWords} words to say. It's ${words_per_second * 60} words per minute`);
+		for (let slide of perSlide) {
+			let timing = Math.round(slide.length / words_per_second);
+			slide.slide.dataset['timing'] = timing;
+		}
+		return perSlide;
+	}
+	function isVisible(el, isParent) {
+		if (el === document) {
+			return true;
+		}
+
+		let style = window.getComputedStyle(el, null);
+		if (!el) {
+			return false;
+		} else if (!style) {
+			return false;
+		} else if (style.display === 'none') {
+			return false;
+		} else if (style.visibility === 'hidden') {
+			return false;
+		} else if (+style.opacity === 0) {
+			return false;
+		} else if (
+			(style.display === 'block' || style.display === 'inline-block')
+			&& (
+				(style.height === '0px' || style.width === '0px')
+				 && style.overflow === 'hidden'
+			)
+		) {
+			return false;
+		} else if (el.tagName === 'UL') {
+			return isParent;
+		} else if (style.position === 'absolute' || style.position === 'fixed') {
+			return isParent;
+		} else {
+			return isVisible(el.parentNode, true);
+		}
+	}
 	function patchSvg(obj) {
 		if (!obj.dataset.was_display) {
 			obj.dataset.was_display = obj.style.display || 'unset';
@@ -159,6 +319,7 @@
 			for (let svg of doc.querySelectorAll("svg")) {
 				is_any = true;
 				svg.setAttribute("style", `--r-background-color: ${sty('--r-background-color')}`);
+				svg.setAttribute("style", `--r-main-color: ${sty('--r-main-color')}`);
 			}
 		}
 		if (!is_any) {
@@ -169,34 +330,80 @@
 	}
 	function update(event) {
 		let cite = event.currentSlide.querySelector("cite");
-		let text = (cite && cite.textContent) || "";
-		document.getElementById("cite").textContent = text;
+		let text = (cite && cite.innerHTML) || "";
+		document.getElementById("cite").innerHTML = text;
 
 		for (let obj of document.querySelectorAll('object[type="image/svg+xml"]')) {
 			patchSvg(obj);
 		}
 	}
-	Reveal.on('ready', update);
-	Reveal.on('slidechanged', update);
-
 	function resetSlideScrolling(slide) {
 		slide.classList.remove('scrollable-slide');
 	}
 	function handleSlideScrolling(slide) {
-		if (slide.scrollHeight >= Reveal.getConfig().height) {
-			slide.classList.add('scrollable-slide');
-			slide.style.height = Reveal.getConfig().height + 'px';
+		if (slide.scrollHeight < Reveal.getConfig().height) {
+			return;
 		}
+		slide.classList.add('scrollable-slide');
+		slide.style.height = Reveal.getConfig().height + 'px';
 	}
-	Reveal.addEventListener('ready', function (event) {
+	function scrollBottom(slide) {
+		setTimeout(function() {
+			if (!slide.classList.contains('scrollable-slide')) {
+				return;
+			}
+			let maximum = 0;
+			let lowest = null;
+			for (let elem of slide.querySelectorAll('*')) {
+				if (!isVisible(elem, false)) {
+					continue;
+				}
+				let rect = elem.getBoundingClientRect();;
+				if (rect.bottom >= maximum) {
+					maximum = rect.bottom;
+					lowest = elem;
+				}
+			}
+			if (lowest) {
+				console.log(lowest);
+				lowest.scrollIntoView({
+					behavior: 'smooth',
+					block: 'nearest'
+				});
+			}
+		}, 150);
+	}
+	function findSlide(elem) {
+		if (elem.tagName === 'SECTION') {
+			return elem;
+		}
+		return findSlide(elem.parentNode);
+	}
+	Reveal.on('ready', function(event) {
+		update(event);
 		handleSlideScrolling(event.currentSlide);
+		computeTimings();
 	});
-	Reveal.addEventListener('slidechanged', function (event) {
+	Reveal.on('slidechanged', function(event) {
+		update(event);
+	});
+	Reveal.on('slidechanged', function (event) {
 		if (event.previousSlide) {
 			resetSlideScrolling(event.previousSlide);
 		}
 		handleSlideScrolling(event.currentSlide);
 	});
+	Reveal.on('fragmentshown', function (event) {
+		let slide = findSlide(event.fragment);
+		scrollBottom(slide);
+	});
+	function toggleDisplay(elem) {
+		if (elem.style.display === "none") {
+			elem.style.display = "block";
+		} else {
+			elem.style.display = "none";
+		}
+	}
 </script>
 </body>
 </html>

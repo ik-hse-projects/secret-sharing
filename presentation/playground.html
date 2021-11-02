@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Playground</title>
+
+	<script src="MathJax/MathJax.js?config=TeX-AMS_HTML-full"></script>
+
+	<script src="nerdamer/nerdamer.core.js"></script>
+	<script src="nerdamer/Algebra.js"></script>
+	<script src="nerdamer/Calculus.js"></script>
+	<script src="nerdamer/Solve.js"></script>
+
+	<script src="math/math.js"></script>
+	<script src="math/function-plot.js"></script>
+	<script src="presentation.js"></script>
+</head>
+<body>
+	<h1>Интерполируем</h1>
+	<form onsubmit="playground_interpolate(event); return false">
+		<p>
+			<label for="points">Точки:</label>
+			<ul>
+				<li>(1, <input type="text" name="y1">)</li>
+				<li>(2, <input type="text" name="y2">)</li>
+				<li>(3, <input type="text" name="y3">)</li>
+				<li>(4, <input type="text" name="y4">)</li>
+			</ul>
+		</p>
+		<p id="equations">
+		</p>
+		<p id="output">
+		</p>
+		<input type="submit" name="">
+	</form>
+</body>
+</html>
