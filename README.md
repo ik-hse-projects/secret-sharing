@@ -6,8 +6,7 @@
 - [Без заметок](/presentation/index.html?showNotes=false)
 
 Также доступно в виде pdf, но не рекомендуется:
-- [pdf с заметками](/presentation/withNotes.pdf)
-- [pdf без заметок](/presentation/presentation.pdf)
+- [pdf с заметками](/presentation/presentation.pdf)
 
 ## Домашнее задание
 - [Задания](/Homework)
