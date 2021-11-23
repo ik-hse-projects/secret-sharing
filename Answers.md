@@ -42,5 +42,9 @@ kramdown:
     - C2 (0.45): Выяснить четность секрета
     - C3 (0.70): Изменить своё значение так, чтобы повлиять на секрет определённым образом
 
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/xm3YgoEiEDc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<div style="
+    position: absolute;
+    width: 100%;
+    height: 100vh;
+    left: 0px;
+"><iframe width="100%" height="100%" src="https://www.youtube.com/embed/xm3YgoEiEDc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
