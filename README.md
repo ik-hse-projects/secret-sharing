@@ -10,7 +10,7 @@
 
 ## Домашнее задание
 - [Задания](/Homework)
-- [Ответы и решения](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+- [Ответы и решения](/Answers)
 
 ## Дополнительно
 - [Исходники (markdown)](https://github.com/ik-hse-projects/secret-sharing/blob/master/presentation/src/slides.md?plain=1)
